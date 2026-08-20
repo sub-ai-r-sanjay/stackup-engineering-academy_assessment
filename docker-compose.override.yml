@@ -1,0 +1,31 @@
+services:
+  etl:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DATA_DIR: /app/datasets
+      OUTPUT_DIR: /app/outputs
+    volumes:
+      - ./datasets:/app/datasets:ro
+      - ./outputs/results/sanjay_subair/02_sql_and_viz:/app/outputs
+
+  airflow-webserver:
+    environment:
+      REPO_ROOT: /opt/airflow
+      DATA_DIR: /opt/airflow/datasets
+      OUTPUT_DIR: /opt/airflow/outputs/results/sanjay_subair/02_sql_and_viz
+      SUBMISSION_DIR: /opt/airflow/submission
+    volumes:
+      - ./solutions/submissions/sanjay_subair:/opt/airflow/submission:ro
+      - ./solutions/submissions/sanjay_subair/03_big_data/airflow_dag.py:/opt/airflow/dags/presight_etl_pipeline.py:ro
+
+  airflow-scheduler:
+    environment:
+      REPO_ROOT: /opt/airflow
+      DATA_DIR: /opt/airflow/datasets
+      OUTPUT_DIR: /opt/airflow/outputs/results/sanjay_subair/02_sql_and_viz
+      SUBMISSION_DIR: /opt/airflow/submission
+    volumes:
+      - ./solutions/submissions/sanjay_subair:/opt/airflow/submission:ro
+      - ./solutions/submissions/sanjay_subair/03_big_data/airflow_dag.py:/opt/airflow/dags/presight_etl_pipeline.py:ro

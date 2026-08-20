@@ -1,0 +1,15 @@
+.git/
+.gitignore
+outputs/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+venv/
+.venv/
+.vscode/
+.idea/
+docs/
+tasks/
+starter_files/

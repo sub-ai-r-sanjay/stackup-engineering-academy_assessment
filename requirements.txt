@@ -6,6 +6,7 @@ pandas>=2.0.0
 numpy>=1.24.0
 
 # Big data
+pyspark>=3.4.0
 
 # Streaming
 kafka-python>=2.0.2
@@ -27,6 +28,7 @@ great-expectations>=0.17.0
 python-dotenv>=1.0.0  # For environment variable management
 pyyaml>=6.0           # For config files
 click>=8.1.0          # For CLI arguments
+matplotlib>=3.7.0     # Dashboard mockup PDF
 
 # Testing
 pytest>=7.4.0
