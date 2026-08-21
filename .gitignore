@@ -24,7 +24,6 @@ env/
 
 # Outputs — candidates generate these locally, they should not be committed
 outputs/
-!outputs/.gitkeep
 
 # Spark
 derby.log
@@ -53,6 +52,3 @@ Thumbs.db
 # Docker
 *.log
 
-# Solutions (do not commit solutions)
-solutions/*
-!solutions/.gitkeep

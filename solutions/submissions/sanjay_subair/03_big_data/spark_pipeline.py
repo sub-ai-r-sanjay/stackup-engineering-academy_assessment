@@ -35,7 +35,10 @@ def load_events(spark: SparkSession, events_dir: str | Path) -> DataFrame:
         StructField("timestamp", TimestampType(), True),
         StructField("payload", MapType(StringType(), StringType()), True),
     ])
-    events = spark.read.schema(schema).json(str(Path(events_dir) / "events_*.jsonl"))
+    event_files = [str(path) for path in sorted(Path(events_dir).glob("events_*.jsonl"))]
+    if not event_files:
+        raise FileNotFoundError(f"No event files found in {events_dir}")
+    events = spark.read.schema(schema).json(event_files)
     print(f"Rows loaded: {events.count():,}")
     return events
 
