@@ -23,7 +23,7 @@ This submission implements all code-oriented requirements across the four pillar
 - `02_sql_and_viz/etl_full.py`: full transaction ETL and summary
 - `02_sql_and_viz/queries.sql`: six business queries
 - `02_sql_and_viz/query_optimization.sql`: baseline/optimized plans and indexes
-- `02_sql_and_viz/dashboard_mockup.py`: actual-data PDF dashboard generator
+- `outputs/results/sanjay_subair/02_sql_and_viz/Presight Spend Performance.pbix`: one-page Power BI executive dashboard
 - `03_big_data/spark_pipeline.py`: five-table Spark pipeline
 - `03_big_data/kafka_streaming.py`: topics, producer, consumer, forwarding, summary
 - `03_big_data/airflow_dag.py`: scheduled DAG with DQ gate and XCom report
@@ -38,7 +38,7 @@ The submission has been exercised against the supplied datasets and local Docker
 - Foundations outputs are present for 500 projects and 1,000 employees, including the employee quality summary.
 - The full Pandas ETL processed 50,000 transactions and wrote cleaned project, employee, and transaction CSV files plus `pipeline_summary.txt`.
 - `query_optimization.sql` records measured DuckDB `EXPLAIN ANALYZE` results: 12.9 ms before and 9.1 ms after optimization, a 1.42x speedup.
-- The Power BI deliverable is present as `02_sql_and_viz/Presight Spend Performance.pbix`.
+- The Power BI deliverable is present as `outputs/results/sanjay_subair/02_sql_and_viz/Presight Spend Performance.pbix`.
 - The Spark pipeline produced all five required Parquet tables under `03_big_data/spark/`, including the required `event_date` and `severity` partitioning.
 - Kafka was run end to end against the Docker broker. It produced and consumed 8,333 January events, forwarded 14 Critical escalations, and wrote `03_big_data/kafka/summary.json`.
 - The Airflow DAG was parsed and tested in Docker. All nine tasks completed successfully, including the DQ gate, transformations, output load, XCom exchanges, and pipeline report generation.
