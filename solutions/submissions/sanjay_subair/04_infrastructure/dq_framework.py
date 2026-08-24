@@ -18,7 +18,7 @@ DQ_CONFIG: dict[str, dict[str, Any]] = {
         "completeness_threshold": 0.90,
         "key_columns": ["project_id", "project_name", "department", "status"],
         "pk_columns": ["project_id"],
-        "numeric_ranges": {"budget": {"min": 0, "max": 10_000_000}, "actual_cost": {"min": 0, "max": 10_000_000}},
+        "numeric_ranges": {"budget": {"min": 0, "max": 10000000}, "actual_cost": {"min": 0, "max": 10000000}},
         "date_columns": {"start_date": {"allow_future": False}, "end_date": {"allow_future": True}},
         "consistency_rules": [
             {"type": "before", "columns": ["start_date", "end_date"]},
@@ -30,7 +30,7 @@ DQ_CONFIG: dict[str, dict[str, Any]] = {
         "completeness_threshold": 0.85,
         "key_columns": ["employee_id", "full_name", "department", "role", "level", "hire_date", "salary"],
         "pk_columns": ["employee_id"],
-        "numeric_ranges": {"salary": {"min": 10_000, "max": 100_000}, "years_experience": {"min": 0, "max": 50}},
+        "numeric_ranges": {"salary": {"min": 10000, "max": 100000}, "years_experience": {"min": 0, "max": 50}},
         "date_columns": {"hire_date": {"allow_future": False}},
         "consistency_rules": [{"type": "salary_level", "salary": "salary", "level": "level"}],
         "foreign_keys": {"manager_id": ("employees", "employee_id", True)},
@@ -39,7 +39,7 @@ DQ_CONFIG: dict[str, dict[str, Any]] = {
         "completeness_threshold": 0.90,
         "key_columns": ["transaction_id", "project_id", "vendor_id", "transaction_date", "payment_status"],
         "pk_columns": ["transaction_id"],
-        "numeric_ranges": {"amount": {"min": 0, "max": 10_000_000}},
+        "numeric_ranges": {"amount": {"min": 0, "max": 10000000}},
         "date_columns": {"transaction_date": {"allow_future": False}},
         "consistency_rules": [{"type": "non_negative", "column": "amount"}],
         "foreign_keys": {
@@ -50,9 +50,9 @@ DQ_CONFIG: dict[str, dict[str, Any]] = {
 }
 
 SALARY_LEVEL_RANGES = {
-    "Junior": (10_000, 22_000), "Mid": (15_000, 32_000),
-    "Senior": (25_000, 48_000), "Lead": (35_000, 65_000),
-    "Executive": (50_000, 100_000),
+    "Junior": (10000, 22000), "Mid": (15000, 32000),
+    "Senior": (25000, 48000), "Lead": (35000, 65000),
+    "Executive": (50000, 100000),
 }
 
 

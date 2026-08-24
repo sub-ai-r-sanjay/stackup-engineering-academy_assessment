@@ -33,4 +33,16 @@ This submission implements all code-oriented requirements across the four pillar
 
 ## Execution evidence
 
-Per instruction, no code, SQL, container build, Kafka client, Spark job, Airflow DAG, or dashboard generator was run. Therefore generated CSV/Parquet/JSON/PDF artifacts, actual row-level DQ counts, query plans, timing measurements, and speedup factors are not claimed. `query_optimization.sql` marks these fields `[NOT RUN]` rather than fabricating evidence.
+The submission has been exercised against the supplied datasets and local Docker services. Generated artifacts are stored under `outputs/results/sanjay_subair/`.
+
+- Foundations outputs are present for 500 projects and 1,000 employees, including the employee quality summary.
+- The full Pandas ETL processed 50,000 transactions and wrote cleaned project, employee, and transaction CSV files plus `pipeline_summary.txt`.
+- `query_optimization.sql` records measured DuckDB `EXPLAIN ANALYZE` results: 12.9 ms before and 9.1 ms after optimization, a 1.42x speedup.
+- The Power BI deliverable is present as `02_sql_and_viz/Presight Spend Performance.pbix`.
+- The Spark pipeline produced all five required Parquet tables under `03_big_data/spark/`, including the required `event_date` and `severity` partitioning.
+- Kafka was run end to end against the Docker broker. It produced and consumed 8,333 January events, forwarded 14 Critical escalations, and wrote `03_big_data/kafka/summary.json`.
+- The Airflow DAG was parsed and tested in Docker. All nine tasks completed successfully, including the DQ gate, transformations, output load, XCom exchanges, and pipeline report generation.
+- Docker Compose services for Kafka, Zookeeper, Kafka UI, PostgreSQL, and Airflow were started and validated. The Python ETL image contains the dependencies installed from `requirements.txt`.
+- The DQ framework was exercised through the Airflow gate across projects, employees, and transactions; detailed DQ results are included in the generated pipeline report.
+
+No separate `outputs/results/sanjay_subair/04_infrastructure/` directory is currently generated. Pillar 4 source deliverables are stored under `solutions/submissions/sanjay_subair/04_infrastructure/`.

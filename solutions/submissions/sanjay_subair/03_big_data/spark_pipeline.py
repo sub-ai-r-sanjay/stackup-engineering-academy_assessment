@@ -12,7 +12,12 @@ from pyspark.sql.types import MapType, StringType, StructField, StructType, Time
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 EVENTS_DIR = Path(os.getenv("DATA_DIR", REPO_ROOT / "datasets")) / "events_stream"
-OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", REPO_ROOT / "outputs" / "results" / "sanjay_subair" / "03_big_data")) / "spark"
+OUTPUT_DIR = Path(
+    os.getenv(
+        "OUTPUT_DIR",
+        REPO_ROOT / "outputs" / "results" / "sanjay_subair" / "03_big_data",
+    )
+) / "spark"
 
 
 def get_spark_session() -> SparkSession:
@@ -20,6 +25,7 @@ def get_spark_session() -> SparkSession:
         SparkSession.builder.appName("PresightEventsProcessing")
         .master("local[*]")
         .config("spark.sql.session.timeZone", "UTC")
+        .config("spark.sql.shuffle.partitions", "16")
         .getOrCreate()
     )
     spark.sparkContext.setLogLevel("WARN")
@@ -35,10 +41,12 @@ def load_events(spark: SparkSession, events_dir: str | Path) -> DataFrame:
         StructField("timestamp", TimestampType(), True),
         StructField("payload", MapType(StringType(), StringType()), True),
     ])
-    event_files = [str(path) for path in sorted(Path(events_dir).glob("events_*.jsonl"))]
+    event_pattern = (Path(events_dir) / "events_*.jsonl").as_posix()
+    event_files = [path.as_posix() for path in sorted(Path(events_dir).glob("events_*.jsonl"))]
     if not event_files:
         raise FileNotFoundError(f"No event files found in {events_dir}")
-    events = spark.read.schema(schema).json(event_files)
+    source = event_files if os.name == "nt" and not os.getenv("HADOOP_HOME") else event_pattern
+    events = spark.read.schema(schema).json(source)
     print(f"Rows loaded: {events.count():,}")
     return events
 
@@ -47,14 +55,22 @@ def validate_events(events: DataFrame) -> DataFrame:
     before_required = events.count()
     valid = events.dropna(subset=["event_id", "user_id"])
     after_required = valid.count()
-    print(f"Dropped missing event_id/user_id: {before_required - after_required:,}")
+    print(
+        "Required-key null drop: "
+        f"before={before_required:,}, after={after_required:,}, "
+        f"dropped={before_required - after_required:,}"
+    )
 
     order = Window.partitionBy("event_id").orderBy(F.col("timestamp").asc_nulls_last())
     deduplicated = valid.withColumn("_event_order", F.row_number().over(order)).filter(
         F.col("_event_order") == 1
     ).drop("_event_order")
     after_deduplication = deduplicated.count()
-    print(f"Dropped duplicate event_id rows: {after_required - after_deduplication:,}")
+    print(
+        "Duplicate event_id drop: "
+        f"before={after_required:,}, after={after_deduplication:,}, "
+        f"dropped={after_required - after_deduplication:,}"
+    )
     return (
         deduplicated
         .withColumn("event_date", F.to_date("timestamp"))
@@ -163,15 +179,15 @@ def write_parquet(table: DataFrame, name: str, output_dir: str | Path) -> None:
 
 
 def _materialize(name: str, builder, timings: dict[str, float]) -> DataFrame:
-    started = time.perf_counter()
+    started = time.time()
     table = builder().cache()
     table.count()
-    timings[name] = time.perf_counter() - started
+    timings[name] = time.time() - started
     return table
 
 
 def run_pipeline() -> None:
-    started = time.perf_counter()
+    started = time.time()
     spark = get_spark_session()
     try:
         raw = load_events(spark, EVENTS_DIR)
@@ -187,7 +203,7 @@ def run_pipeline() -> None:
         }
         for name, table in tables.items():
             write_parquet(table, name, OUTPUT_DIR)
-        elapsed = time.perf_counter() - started
+        elapsed = time.time() - started
         print(f"Aggregation timings (seconds): {timings}")
         print(f"Total rows processed: {total_rows:,}")
         print(f"Total execution time: {elapsed:.3f} seconds")
