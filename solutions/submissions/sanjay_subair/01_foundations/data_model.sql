@@ -174,7 +174,8 @@ history_states AS (
             + (h.same_day_sequence - 1) * INTERVAL 1 SECOND AS valid_from,
         h.change_reason
     FROM ordered_history h
-    JOIN stg_employees e USING (employee_id)
+        JOIN stg_employees e
+            ON h.employee_id = e.employee_id
 ),
 latest_history AS (
     SELECT employee_id, MAX(CAST(effective_date AS DATE)) AS latest_effective_date
@@ -193,7 +194,8 @@ current_states AS (
         CASE WHEN h.latest_effective_date IS NULL THEN 'Initial current record'
              ELSE 'Current source snapshot' END AS change_reason
     FROM stg_employees e
-    LEFT JOIN latest_history h USING (employee_id)
+        LEFT JOIN latest_history h
+            ON e.employee_id = h.employee_id
 ),
 all_states AS (
     SELECT * FROM history_states
@@ -250,8 +252,8 @@ SELECT
     t.transaction_id, p.project_key, e.employee_key, v.vendor_key, d.date_key,
     COALESCE(t.amount, 0), t.category, t.payment_status
 FROM stg_transactions t
-JOIN dim_project p USING (project_id)
-JOIN dim_vendor v USING (vendor_id)
+JOIN dim_project p ON t.project_id = p.project_id
+JOIN dim_vendor v ON t.vendor_id = v.vendor_id
 JOIN dim_date d ON d.full_date = CAST(t.transaction_date AS DATE)
 LEFT JOIN dim_employee e
   ON e.employee_id = t.approved_by
